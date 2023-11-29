@@ -7,7 +7,7 @@
 }
 
 :root {
-  --color-primary: #020d18;
+  --color-primary: #000;
   --color-secondary: #f1c40f;
 }
 
@@ -122,7 +122,7 @@ ul {
 
 /* Card */
 .card {
-  background: #04376b;
+  background: #1a1a1a;
   padding: 5px;
 }
 
@@ -138,12 +138,10 @@ ul {
 .card:hover {
   transform: scale(1.05);
   transition: all 0.5s ease-in-out;
-  background: #0a4b8f;
 }
 
 /* Footer */
 .main-footer {
-  background: #020d18;
   padding: 20px 0;
   margin-top: 20px;
 }
