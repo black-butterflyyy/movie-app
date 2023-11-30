@@ -30,7 +30,9 @@ async function displayPopularMovies() {
               <small class="text-muted">Release: ${movie.release_date}</small>
             </p>
             <p class="card-text">
-                <small class="text-muted">Vote: ${movie.vote_average}</small>
+                <small class="text-muted"><i class="fas fa-star text-secondary"></i> ${movie.vote_average.toFixed(
+                  1
+                )} / 10</small>
             </p>
             
           </div>
@@ -68,8 +70,9 @@ async function displayPopularShows() {
               <small class="text-muted">Air date: ${show.first_air_date}</small>
             </p>
             <p class="card-text">
-                <small class="text-muted">Vote: ${show.vote_average}</small>
-            </p>
+<small class="text-muted"><i class="fas fa-star text-secondary"></i> ${show.vote_average.toFixed(
+      1
+    )} / 10</small>            </p>
             
           </div>
         `;
