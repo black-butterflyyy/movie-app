@@ -81,8 +81,9 @@ async function displayPopularShows() {
 // Display movie details
 async function displayMovieDetails() {
   const movieId = window.location.search.split('=')[1];
-  const movie = await fetchAPIData(`show/${movieId}`);
+  const movie = await fetchAPIData(`movie/${movieId}`);
 
+  console.log(movie);
   // Overly for background image
   displayBackgroundImage('movie', movie.backdrop_path);
 
