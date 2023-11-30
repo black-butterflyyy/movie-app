@@ -83,7 +83,6 @@ async function displayMovieDetails() {
   const movieId = window.location.search.split('=')[1];
   const movie = await fetchAPIData(`movie/${movieId}`);
 
-  console.log(movie);
   // Overly for background image
   displayBackgroundImage('movie', movie.backdrop_path);
 
