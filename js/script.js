@@ -292,6 +292,33 @@ async function displayMovieRecommendations() {
   });
 }
 
+// Display tv-show recommendations
+async function displayShowRecommendations() {
+  const showId = window.location.search.split('=')[1];
+  const { results } = await fetchAPIData(`tv/${showId}/recommendations`);
+  results.forEach((show) => {
+    if (show.poster_path) {
+      const div = document.createElement('div');
+      div.classList.add('swiper-slide');
+      div.innerHTML = `
+    <a href="show-details.html?id=${show.id}">
+              <img src="https://image.tmdb.org/t/p/w500${
+                show.poster_path
+              }" alt="${show.name}" />
+            </a>
+            <h4 class="swiper-rating">
+              <i class="fas fa-star text-secondary"></i> ${show.vote_average.toFixed(
+                1
+              )} / 10
+            </h4>
+    `;
+      document.querySelector('.swiper-wrapper').appendChild(div);
+
+      initSwipper();
+    }
+  });
+}
+
 //Swipper library
 function initSwipper() {
   const swiper = new Swiper('.swiper', {
@@ -390,6 +417,7 @@ function init() {
       break;
     case '/tv-details.html':
       displayShowDetails();
+      displayShowRecommendations();
       break;
     case '/search.html':
       console.log('search');
