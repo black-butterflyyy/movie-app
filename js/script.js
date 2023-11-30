@@ -243,7 +243,6 @@ function displayBackgroundImage(type, backgroundPath) {
 // Display now playing movies
 async function displayNowPlayingSlider() {
   const { results } = await fetchAPIData(`movie/now_playing`);
-  console.log(results);
 
   results.forEach((movie) => {
     const div = document.createElement('div');
@@ -263,6 +262,33 @@ async function displayNowPlayingSlider() {
     document.querySelector('.swiper-wrapper').appendChild(div);
 
     initSwipper();
+  });
+}
+
+// Display movies recommendations
+async function displayMovieRecommendations() {
+  const movieId = window.location.search.split('=')[1];
+  const { results } = await fetchAPIData(`movie/${movieId}/recommendations`);
+  results.forEach((movie) => {
+    if (movie.poster_path) {
+      const div = document.createElement('div');
+      div.classList.add('swiper-slide');
+      div.innerHTML = `
+    <a href="movie-details.html?id=${movie.id}">
+              <img src="https://image.tmdb.org/t/p/w500${
+                movie.poster_path
+              }" alt="${movie.title}" />
+            </a>
+            <h4 class="swiper-rating">
+              <i class="fas fa-star text-secondary"></i> ${movie.vote_average.toFixed(
+                1
+              )} / 10
+            </h4>
+    `;
+      document.querySelector('.swiper-wrapper').appendChild(div);
+
+      initSwipper();
+    }
   });
 }
 
@@ -360,6 +386,7 @@ function init() {
       break;
     case '/movie-details.html':
       displayMovieDetails();
+      displayMovieRecommendations();
       break;
     case '/tv-details.html':
       displayShowDetails();
