@@ -96,6 +96,7 @@ async function displayPopularShows() {
 async function displayMovieDetails() {
   const movieId = window.location.search.split('=')[1];
   const movie = await fetchAPIData(`movie/${movieId}`);
+  const { cast } = await fetchAPIData(`movie/${movieId}/credits`);
 
   // Overly for background image
   displayBackgroundImage('movie', movie.backdrop_path);
@@ -154,8 +155,29 @@ async function displayMovieDetails() {
           <div class="list-group">
            ${movie.production_companies
              .map((company) => `<span>${company.name}</span>`)
-             .join(', ')} </div>
-        </div>`;
+             .join(', ')} 
+             </div>
+
+             <div class="grid cast">
+           ${cast
+             .slice(0, 20)
+             .map(
+               (member) => `
+               <div class="cast-member">
+
+               <img
+              src="https://image.tmdb.org/t/p/w300/${member.profile_path}"
+              class="cast-img"
+              alt="${member.name}"
+             />
+            <p><span class="text-secondary">Name: </span>${member.name}</p>
+            <p><span class="text-secondary">Character: </span>${member.character}</p>
+          </div>
+
+  `
+             )
+             .join('')}
+             </div>`;
 
   document.querySelector('#movie-details').appendChild(div);
 }

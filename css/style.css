@@ -364,3 +364,23 @@ section h2 {
   z-index: -1;
   opacity: 0.3;
 }
+
+.cast {
+  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-gap: 20px;
+  column-gap: 30px;
+  align-items: start;
+  line-height: 1.8;
+}
+
+.cast-member {
+  font-size: 1rem;
+}
+
+.cast-img {
+  border-radius: 10px;
+  height: 50%;
+  width: 100%;
+  object-fit: cover;
+}
