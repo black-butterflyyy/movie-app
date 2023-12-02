@@ -1,5 +1,16 @@
 const state = {
   currentPage: window.location.pathname,
+  search: {
+    term: '',
+    type: '',
+    page: 1,
+    totalPages: 1,
+    totalResults: 0,
+  },
+  api: {
+    key: '9c50fc473f517bbfab571ebd19f1c033',
+    url: 'https://api.themoviedb.org/3/',
+  },
 };
 
 // Display 20 most popular movies
@@ -363,8 +374,8 @@ function initSwipper() {
 
 // Fetch data form TMDB API
 async function fetchAPIData(endpoint) {
-  const API_KEY = '9c50fc473f517bbfab571ebd19f1c033';
-  const API_URL = 'https://api.themoviedb.org/3/';
+  const API_KEY = state.api.key;
+  const API_URL = state.api.url;
 
   showSpinner();
   const response = await fetch(
@@ -374,6 +385,132 @@ async function fetchAPIData(endpoint) {
   const data = await response.json();
   hideSpinner();
   return data;
+}
+
+// Search data from TMDB API
+async function searchAPIData() {
+  const API_KEY = state.api.key;
+  const API_URL = state.api.url;
+
+  showSpinner();
+
+  const response = await fetch(
+    `${API_URL}/search/${state.search.type}?api_key=${API_KEY}&language=en-US&query=${state.search.term}&page=${state.search.page}`
+  );
+
+  const data = await response.json();
+  hideSpinner();
+  return data;
+}
+
+// Search movies/shows
+async function search() {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  state.search.type = urlParams.get('type');
+  state.search.term = urlParams.get('search-term');
+  if (state.search.term !== '' && state.search.term !== null) {
+    const { results, total_pages, page, total_results } = await searchAPIData();
+
+    // Update search state
+    state.search.page = page;
+    state.search.totalResults = total_results;
+    state.search.totalPages = total_pages;
+
+    if (results.length === 0) {
+      return showAlert('No results found!');
+    }
+    displaySearchResults(results);
+    document.querySelector('#search-term').value = '';
+  } else {
+    return showAlert('Please enter a search term');
+  }
+}
+
+// Display the results of search
+function displaySearchResults(results) {
+  //Clear previous results
+  document.querySelector('#search-results').innerHTML = '';
+  document.querySelector('#search-results-heading').innerHTML = '';
+  document.querySelector('#pagination').innerHTML = '';
+
+  results.forEach((result) => {
+    const div = document.createElement('div');
+    div.classList.add('card');
+    div.innerHTML = ` 
+          <a href="${state.search.type}-details.html?id=${result.id}">
+          ${
+            result.poster_path
+              ? `  <img
+              src="https://image.tmdb.org/t/p/w500${result.poster_path}"
+              class="card-img-top"
+              alt="${result.title ?? result.name}"
+            />`
+              : `  <img
+              src="/images/no-image.jpg"
+              class="card-img-top"
+              alt="${result.title ?? result.name}"
+            />`
+          }
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">${result.title ?? result.name}</h5>
+            <p class="card-text">
+              <small class="text-muted">Release: ${
+                result.release_date ?? result.first_air_date
+              }</small>
+            </p>
+            <p class="card-text">
+                <small class="text-muted"><i class="fas fa-star text-secondary"></i> ${result.vote_average.toFixed(
+                  1
+                )} / 10</small>
+            </p>
+            
+          </div>
+        `;
+
+    document.querySelector('#search-results').appendChild(div);
+  });
+  document.querySelector(
+    '#search-results-heading'
+  ).innerHTML = `<h2>${results.length} of ${state.search.totalResults} results for <span class="text-primary">${state.search.term}</span></h2>`;
+  displayPagination();
+}
+
+// Display pagination for search
+function displayPagination() {
+  const div = document.createElement('div');
+  div.classList.add('pagination');
+  div.innerHTML = `
+  <button class="btn btn-primary" id="prev">Prev</button>
+  <button class="btn btn-primary" id="next">Next</button>
+  <div class="page-counter">Page ${state.search.page} of ${state.search.totalPages} </div>
+  `;
+  document.querySelector('#pagination').appendChild(div);
+
+  // Disable prev button on first page
+  if (state.search.page === 1) {
+    document.querySelector('#prev').disabled = true;
+  }
+
+  // Disable next button on last page
+  if (state.search.page === state.search.totalPages) {
+    document.querySelector('#next').disabled = true;
+  }
+
+  // Next page
+  document.querySelector('#next').addEventListener('click', async () => {
+    state.search.page++;
+    const { results } = await searchAPIData();
+    displaySearchResults(results);
+  });
+
+  // Prev page
+  document.querySelector('#prev').addEventListener('click', async () => {
+    state.search.page--;
+    const { results } = await searchAPIData();
+    displaySearchResults(results);
+  });
 }
 
 function showSpinner() {
@@ -393,6 +530,15 @@ function highlightActiveLink() {
       link.classList.add('active');
     }
   });
+}
+
+// Show Error Alert
+function showAlert(message, className = 'error') {
+  const alertElement = document.createElement('div');
+  alertElement.classList.add('alert', className);
+  alertElement.appendChild(document.createTextNode(message));
+  document.querySelector('#alert').appendChild(alertElement);
+  setTimeout(() => alertElement.remove(), 3000);
 }
 
 function addCommasToNumber(number) {
@@ -421,7 +567,8 @@ function init() {
       displayShowRecommendations();
       break;
     case '/search.html':
-      console.log('search');
+    case '/search':
+      search();
       break;
   }
 
