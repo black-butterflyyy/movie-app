@@ -157,8 +157,10 @@ async function displayMovieDetails() {
              .map((company) => `<span>${company.name}</span>`)
              .join(', ')} 
              </div>
+                       <h2>Cast</h2>
 
              <div class="grid cast">
+
            ${cast
              .slice(0, 20)
              .map(
