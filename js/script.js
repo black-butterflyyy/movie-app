@@ -96,7 +96,8 @@ async function displayPopularShows() {
 async function displayMovieDetails() {
   const movieId = window.location.search.split('=')[1];
   const movie = await fetchAPIData(`movie/${movieId}`);
-  const { cast } = await fetchAPIData(`movie/${movieId}/credits`);
+  const { cast, crew } = await fetchAPIData(`movie/${movieId}/credits`);
+  const director = crew.flat().filter((member) => member.job === 'Director')[0];
 
   // Overly for background image
   displayBackgroundImage('movie', movie.backdrop_path);
@@ -128,8 +129,7 @@ async function displayMovieDetails() {
             <p>
               ${movie.overview}
             </p>
-            <h5>Genres</h5>
-            <ul class="list-group">
+            <ul class="list-group genres">
              ${movie.genres.map((genre) => `<li>${genre.name}</li>`).join('')}
             </ul>
             <a href="${
@@ -140,6 +140,11 @@ async function displayMovieDetails() {
         <div class="details-bottom">
           <h2>Movie Info</h2>
           <ul>
+              ${
+                director
+                  ? `<li><span class="text-secondary">Director:</span> ${director.name}</li>`
+                  : ''
+              }
             <li><span class="text-secondary">Budget:</span> $${addCommasToNumber(
               movie.budget
             )}</li>
@@ -163,6 +168,7 @@ async function displayMovieDetails() {
 
            ${cast
              .slice(0, 20)
+             .filter((member) => member.profile_path)
              .map(
                (member) => `
                <div class="cast-member">
@@ -188,7 +194,8 @@ async function displayMovieDetails() {
 async function displayShowDetails() {
   const showId = window.location.search.split('=')[1];
   const show = await fetchAPIData(`tv/${showId}`);
-  const { cast } = await fetchAPIData(`tv/${showId}/credits`);
+  const { cast, crew } = await fetchAPIData(`tv/${showId}/credits`);
+  const director = crew.flat().filter((member) => member.job === 'Director')[0];
 
   // Overly for background image
   displayBackgroundImage('tv', show.backdrop_path);
@@ -220,8 +227,7 @@ async function displayShowDetails() {
             <p>
               ${show.overview}
             </p>
-            <h5>Genres</h5>
-            <ul class="list-group">
+            <ul class="list-group genres">
               ${show.genres.map((genre) => `<li>${genre.name}</li>`).join('')}
             </ul>
             <a href="${
@@ -232,6 +238,11 @@ async function displayShowDetails() {
         <div class="details-bottom">
           <h2>Show Info</h2>
           <ul>
+          ${
+            director
+              ? `<li><span class="text-secondary">Director:</span> ${director.name}</li>`
+              : ''
+          }
             <li><span class="text-secondary">Number Of Seasons: </span> ${
               show.number_of_seasons
             }</li>
@@ -256,6 +267,7 @@ async function displayShowDetails() {
 
            ${cast
              .slice(0, 20)
+             .filter((member) => member.profile_path)
              .map(
                (member) => `
                <div class="cast-member">
